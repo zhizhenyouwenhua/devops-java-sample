@@ -4,7 +4,6 @@ metadata:
   labels:
     app: ads-network
   name: ads-network
-  namespace: default
 spec:
   ports:
   - name: http

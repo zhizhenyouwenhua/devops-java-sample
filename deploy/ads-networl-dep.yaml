@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ads-network
+  name: ads-network
+  namespace: default
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ads-network
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: ads-network
+    spec:
+      containers:
+      - env:
+        - name: Xms
+          value: "512"
+        - name: Xmx
+          value: "512"
+        - name: aliyun_logs_accesslog
+          value: /data/logs/cncp-operations-manager/access.log
+        - name: aliyun_logs_catalinaout
+          value: /data/logs/cncp-operations-manager/catalina-daemon.out
+        - name: aliyun_logs_debuglog
+          value: /data/logs/cncp-operations-manager/log/debug.log
+        - name: aliyun_logs_faillog
+          value: /data/logs/cncp-operations-manager/log/faillog.log
+        - name: aliyun_logs_infolog
+          value: /data/logs/cncp-operations-manager/log/info.log
+        - name: aliyun_logs_stdout
+          value: stdout
+        - name: port
+          value: "9365"
+        image: harbor.hk.batmobi.cn/batmobi/ads-network:SNAPSHOT-master-9
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /check/normals
+            port: 9365
+            scheme: HTTP
+          initialDelaySeconds: 300
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: ads-network
+        ports:
+        - containerPort: 9365
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /check/normals
+            port: 9365
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /data/logs/
+          name: logs
+        - mountPath: /dev/shm
+          name: dshm
+        - mountPath: /usr/local/share/GeoIP
+          name: geoip
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: logs
+      - emptyDir:
+          medium: Memory
+        name: dshm
+      - hostPath:
+          path: /usr/local/share/GeoIP
+          type: ""
+        name: geoip

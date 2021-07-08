@@ -1,4 +1,4 @@
-amePrefix: kustomize-
+namePrefix: kustomize-
 
 resources:
 - ads-networl-dep.yaml

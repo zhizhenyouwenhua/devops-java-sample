@@ -40,7 +40,7 @@ spec:
           value: stdout
         - name: port
           value: "9365"
-        image: harbor.hk.batmobi.cn/batmobi/ads-network:SNAPSHOT-master-8
+        image: harbor.hk.batmobi.cn/batmobi/ads-network:replace
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 3
